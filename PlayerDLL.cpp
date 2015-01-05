@@ -1,9 +1,10 @@
 #include <iostream>
-#include "PlayerDLL.h"
-#include "GameLogic.h"
 #include <stdlib.h>
 #include <time.h>
 #include <crtdbg.h>
+#include "PlayerDLL.h"
+#include "GameLogic.h"
+#include "Boards.h"
 
 #define DLL_EXPORT
 
@@ -19,39 +20,6 @@ char* pPossibleMoves;
 
 const int SEARCH_DEPTH = 10;
 const int INF = 10000;
-
-static int PositionStrategy[64] = {
-	10000, -8, 8, 6, 6, 8, -8, 10000,
-	-8, -50, -4, -3, -3, -4, -50, -8,
-	8, -4, 7, 4, 4, 7, -4, 8,
-	6, -3, 4, 0, 0, 4, -3, 6,
-	6, -3, 4, 0, 0, 4, -3, 6,
-	8, -4, 7, 4, 4, 7, -4, 8,
-	-8, -50, -4, -3, -3, -4, -50, -8,
-	10000, -8, 8, 6, 6, 8, -8, 10000
-};
-
-static int ClockWise[64] = {
-	56, 48, 40, 32, 24, 16, 8, 0,
-	57, 49, 41, 33, 25, 17, 9, 1,
-	58, 50, 42, 34, 26, 18, 10, 2,
-	59, 51, 43, 35, 27, 19, 11, 3,
-	60, 52, 44, 36, 28, 20, 12, 4,
-	61, 53, 45, 37, 29, 21, 13, 5,
-	62, 54, 46, 38, 30, 22, 14, 6,
-	63, 55, 47, 39, 31, 23, 15, 7
-};
-
-static int Corner[64] = {
-	0, 0, 0, 0, 7, 7, 7, 7,
-	0, 0, 0, 0, 7, 7, 7, 7,
-	0, 0, 0, 0, 7, 7, 7, 7,
-	0, 0, 0, 0, 7, 7, 7, 7,
-	56, 56, 56, 56, 63, 63, 63, 63,
-	56, 56, 56, 56, 63, 63, 63, 63,
-	56, 56, 56, 56, 63, 63, 63, 63,
-	56, 56, 56, 56, 63, 63, 63, 63
-};
 
 int GetPositionScore(const char* pBoard, int nMove, bool bIsBlack)
 {
