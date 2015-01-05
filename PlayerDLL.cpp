@@ -19,6 +19,7 @@ int nActivePossibleMoves = 0;
 char* pPossibleMoves;
 
 const int SEARCH_DEPTH = 10;
+const int SEARCH_DEPTH_LATE = 18;
 const int INF = 10000;
 
 int GetPositionScore(const char* pBoard, int nMove, bool bIsBlack)
@@ -203,7 +204,7 @@ inline void GetPossibleMoves(const char* pBoard, bool bIsBlack, char* PossibleMo
 	}
 }
 
-int EvaluateMove(const char* pBoard, int nMove, bool bIsBlack, bool bIsBlackGood, int nDepth, int nAlpha, int nBeta)
+bool CheckPetterns(const char* pBoard, const int &nMoveNr, const int& nMove, const bool& bIsBlack, const bool& bIsBlackGood, const int& nDepth, int &nRet)
 {
 	if (bIsBlack == bIsBlackGood)
 	{
@@ -211,7 +212,10 @@ int EvaluateMove(const char* pBoard, int nMove, bool bIsBlack, bool bIsBlackGood
 			|| ((nMove == 6 || nMove == 14 || nMove == 15) && pBoard[7] == 0)
 			|| ((nMove == 48 || nMove == 49 || nMove == 57) && pBoard[56] == 0)
 			|| ((nMove == 54 || nMove == 55 || nMove == 62) && pBoard[63] == 0))
-			return -100;
+		{
+			nRet = -100;
+			return true;
+		}
 	}
 	if (bIsBlack == bIsBlackGood)
 	{
@@ -219,19 +223,65 @@ int EvaluateMove(const char* pBoard, int nMove, bool bIsBlack, bool bIsBlackGood
 			|| nMove == 7
 			|| nMove == 56
 			|| nMove == 63)
-			return 100;
+		{
+			nRet = 100;
+			return true;
+		}
 	}
+
+	if (nMoveNr == 1)
+	{
+		if (pBoard[19] == 1 && nMove == 20)
+		{
+			nRet = -100;
+			return true;
+		}
+		if (pBoard[26] == 1 && nMove == 34)
+		{
+			nRet = -100;
+			return true;
+		}
+		if (pBoard[37] == 1 && nMove == 29)
+		{
+			nRet = -100;
+			return true;
+		}
+		if (pBoard[44] == 1 && nMove == 43)
+		{
+			nRet = -100;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int EvaluateMove(const char* pBoard, int nMoveNr, int nMove, bool bIsBlack, bool bIsBlackGood, int nDepth, int nAlpha, int nBeta)
+{
+	int nRet = 0;
+	if (CheckPetterns(pBoard, nMoveNr, nMove, bIsBlack, bIsBlackGood, nDepth, nRet))
+		return nRet;
 
 	_ASSERT(nActiveBoard < NUM_BOARDS);
 	char* pTestBoard = &pBoards[BOARDSIZE * nActiveBoard++];
 	memcpy(pTestBoard, pBoard, sizeof(char) * 64);
 	OnlyPlaceBrick(pTestBoard, nMove, bIsBlack);
+	nMoveNr++;
 
 	char PossibleMoves[nMaxPossibleMoves];
 	memset(&PossibleMoves, -1, sizeof(char)*nMaxPossibleMoves);
 	int nCount = 0;
 	if (nDepth == 0)
 	{
+		/*int nMyScore = 0;
+		int nEnemyScore = 0;
+		GetPossibleMoves(pTestBoard, bIsBlackGood, &PossibleMoves[0], nMyScore);
+
+		char PossibleMoves[nMaxPossibleMoves];
+		memset(&PossibleMoves, -1, sizeof(char)*nMaxPossibleMoves);
+		GetPossibleMoves(pTestBoard, !bIsBlackGood, &PossibleMoves[0], nEnemyScore);
+		return nMyScore - nEnemyScore;*/
+
 		GetPossibleMoves(pTestBoard, bIsBlackGood, &PossibleMoves[0], nCount);
 		return nCount;
 	}
@@ -249,7 +299,7 @@ int EvaluateMove(const char* pBoard, int nMove, bool bIsBlack, bool bIsBlackGood
 	{
 		for (int i = 0; i < nCount; ++i)
 		{
-			int nNewScore = EvaluateMove(pTestBoard, PossibleMoves[i], !bIsBlack, bIsBlackGood, nDepth - 1, nAlpha, nBeta);
+			int nNewScore = EvaluateMove(pTestBoard, nMoveNr, PossibleMoves[i], !bIsBlack, bIsBlackGood, nDepth - 1, nAlpha, nBeta);
 			if (nNewScore < nBeta)
 			{
 				nBeta = nNewScore;
@@ -264,7 +314,7 @@ int EvaluateMove(const char* pBoard, int nMove, bool bIsBlack, bool bIsBlackGood
 	{
 		for (int i = 0; i < nCount; ++i)
 		{
-			int nNewScore = EvaluateMove(pTestBoard, PossibleMoves[i], !bIsBlack, bIsBlackGood, nDepth - 1, nAlpha, nBeta);
+			int nNewScore = EvaluateMove(pTestBoard, nMoveNr, PossibleMoves[i], !bIsBlack, bIsBlackGood, nDepth - 1, nAlpha, nBeta);
 			if (nNewScore > nAlpha)
 			{
 				nAlpha = nNewScore;
@@ -307,12 +357,16 @@ extern "C"
 		int nAlpha = -INF;
 		int nBeta = INF;
 
+		int nDepth = SEARCH_DEPTH - 1;
+		if (nMoveNr >= 35)
+			nDepth = SEARCH_DEPTH_LATE - 1;
+
 		for (int i = 0; i < nCount; ++i)
 		{
 			nActiveBoard = 0;
 			char* pTestBoard = &pBoards[BOARDSIZE * nActiveBoard++];
 			memcpy(pTestBoard, pCharBoard, sizeof(char) * 64);
-			int nScore = EvaluateMove(pTestBoard, PossibleMoves[i], bIsBlack, bIsBlack, SEARCH_DEPTH-1, nAlpha, nBeta);
+			int nScore = EvaluateMove(pTestBoard, nMoveNr, PossibleMoves[i], bIsBlack, bIsBlack, nDepth, nAlpha, nBeta);
 			if (nScore > nAlpha)
 			{
 				nAlpha = nScore;
