@@ -51,7 +51,7 @@ static bool BorderCheck(int nMove, int nDirection)
 	return true;
 }
 
-static bool CheckDirection(char* pBoard, int nMove, int nDirection, bool bIsBlack, bool bDoFlip = false)
+inline static bool CheckDirection(char* pBoard, const int& nMove, int nDirection, bool bIsBlack, bool bDoFlip = false)
 {
 	int nPlayer = (bIsBlack ? 1 : 2);
 	int nEnemy = (bIsBlack ? 2 : 1);
@@ -86,7 +86,7 @@ static bool CheckDirection(char* pBoard, int nMove, int nDirection, bool bIsBlac
 	return false;
 }
 
-static bool CheckDirection(const char* pBoard, int nMove, int nDirection, bool bIsBlack)
+inline static bool CheckDirection(const char* pBoard, const int& nMove, int nDirection, bool bIsBlack)
 {
 	int nPlayer = (bIsBlack ? 1 : 2);
 	int nEnemy = (bIsBlack ? 2 : 1);
@@ -116,7 +116,7 @@ static bool CheckDirection(const char* pBoard, int nMove, int nDirection, bool b
 	return false;
 }
 
-static bool IsValidMove(const char* pBoard, int nMove, bool bIsBlack)
+inline static bool IsValidMove(const char* pBoard, const int& nMove, bool bIsBlack)
 {
 	if (pBoard[nMove] > 0)
 		return false;
