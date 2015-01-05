@@ -18,8 +18,8 @@ static const int nMaxPossibleMoves = 30;
 int nActivePossibleMoves = 0;
 char* pPossibleMoves;
 
-const int SEARCH_DEPTH = 10;
-const int SEARCH_DEPTH_LATE = 18;
+const int SEARCH_DEPTH = 9;
+const int SEARCH_DEPTH_LATE = 16;
 const int INF = 10000;
 
 int GetPositionScore(const char* pBoard, int nMove, bool bIsBlack)
@@ -204,7 +204,7 @@ inline void GetPossibleMoves(const char* pBoard, bool bIsBlack, char* PossibleMo
 	}
 }
 
-bool CheckPetterns(const char* pBoard, const int &nMoveNr, const int& nMove, const bool& bIsBlack, const bool& bIsBlackGood, const int& nDepth, int &nRet)
+bool CheckPatterns(const char* pBoard, const int &nMoveNr, const int& nMove, const bool& bIsBlack, const bool& bIsBlackGood, const int& nDepth, int &nRet)
 {
 	if (bIsBlack == bIsBlackGood)
 	{
@@ -259,7 +259,7 @@ bool CheckPetterns(const char* pBoard, const int &nMoveNr, const int& nMove, con
 int EvaluateMove(const char* pBoard, int nMoveNr, int nMove, bool bIsBlack, bool bIsBlackGood, int nDepth, int nAlpha, int nBeta)
 {
 	int nRet = 0;
-	if (CheckPetterns(pBoard, nMoveNr, nMove, bIsBlack, bIsBlackGood, nDepth, nRet))
+	if (CheckPatterns(pBoard, nMoveNr, nMove, bIsBlack, bIsBlackGood, nDepth, nRet))
 		return nRet;
 
 	_ASSERT(nActiveBoard < NUM_BOARDS);
@@ -273,17 +273,17 @@ int EvaluateMove(const char* pBoard, int nMoveNr, int nMove, bool bIsBlack, bool
 	int nCount = 0;
 	if (nDepth == 0)
 	{
-		/*int nMyScore = 0;
+		int nMyScore = 0;
 		int nEnemyScore = 0;
 		GetPossibleMoves(pTestBoard, bIsBlackGood, &PossibleMoves[0], nMyScore);
 
-		char PossibleMoves[nMaxPossibleMoves];
+		//char PossibleMoves[nMaxPossibleMoves];
 		memset(&PossibleMoves, -1, sizeof(char)*nMaxPossibleMoves);
 		GetPossibleMoves(pTestBoard, !bIsBlackGood, &PossibleMoves[0], nEnemyScore);
-		return nMyScore - nEnemyScore;*/
+		return nMyScore - nEnemyScore;
 
-		GetPossibleMoves(pTestBoard, bIsBlackGood, &PossibleMoves[0], nCount);
-		return nCount;
+		/*GetPossibleMoves(pTestBoard, bIsBlackGood, &PossibleMoves[0], nCount);
+		return nCount;*/
 	}
 	else
 	{
